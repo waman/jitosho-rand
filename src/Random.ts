@@ -2,7 +2,7 @@ interface Random{
     next(): number;
 }
 
-/** Create the new Random Number Generator (RNG) */
+/** Create a new Random Number Generator (RNG) */
 export function* newRNG(rand?: Random){
     const rng = rand ? rand : UniformRandom.getDefault();
     while(true){
@@ -25,6 +25,9 @@ export abstract class UniformRandom implements Random{
         return new RandomImprove(this, poolSize);
     }
 
+    /** 
+     * UniformRandom implmentation with the Math.random().
+     */
     static getDefault(): UniformRandom{
         return new DefaultUniformRandom();
     }

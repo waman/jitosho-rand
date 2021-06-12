@@ -9,8 +9,8 @@ export class UniformRandomTester{
     for(let i = 0; i < 20; i++){
       testResults.push(this.testOneTime(rand, n));
     }
-    return testResults.filter(r => r.mean).length >= 19
-            && testResults.filter(r => r.cc).length >= 19;
+    return testResults.filter(r => r.mean).length >= 18  // prefer to 19
+            && testResults.filter(r => r.cc).length >= 18;  // prefer to 19
   }
 
   private static testOneTime(rand: UniformRandom, n: number): TestResult {
@@ -21,9 +21,14 @@ export class UniformRandomTester{
       s1 += x; s2 += x*x; r += xprev*x;
       xprev = x;
     }
+    r += x*x0;
+
     const meanError = s1 * Math.sqrt(12.0/n);
-    const cc = (n*(r+x*x0)-s1*s1) / (n*s2 - s1*s1);
+
+    const s12 = s1*s1;
+    const cc = (n*r-s12) / (n*s2 - s12);
     const ccError = ((n-1)*cc+1.0)*Math.sqrt((n+1.0)/(n*(n-3.0)));
+    
     // console.log(`mean: ${meanError}, cc: ${ccError}`);
     return {mean: Math.abs(meanError) <= 2.0, cc: Math.abs(ccError) <= 2.0 };
   }
