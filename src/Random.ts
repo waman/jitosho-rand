@@ -1,8 +1,9 @@
 interface Random{
+    /** Return a random number. */
     next(): number;
 }
 
-/** Create a new Random Number Generator (RNG) */
+/** Create a new Random Number Generator (RNG). */
 export function* newRNG(rand?: Random){
     const rng = rand ? rand : UniformRandom.getDefault();
     while(true){
@@ -11,12 +12,15 @@ export function* newRNG(rand?: Random){
 }
 
 export abstract class UniformRandom implements Random{
+    /** Return a random number in [0,1). */
     abstract next(): number;
 
+    /** Return a random number in [0,max). */
     nextNumber(max: number): number {
         return this.next() * max;
     }
 
+    /** Return a random number in [min, max). */
     nextNumberIn(min: number, max: number): number {
         return min + this.next() * (max - min);
     }
@@ -25,9 +29,7 @@ export abstract class UniformRandom implements Random{
         return new RandomImprove(this, poolSize);
     }
 
-    /** 
-     * UniformRandom implmentation with the Math.random().
-     */
+    /** UniformRandom implmentation with the Math.random(). */
     static getDefault(): UniformRandom{
         return new DefaultUniformRandom();
     }
@@ -41,10 +43,10 @@ class DefaultUniformRandom extends UniformRandom{
 
 class RandomImprove extends UniformRandom{
 
-    private static DEFAULT_POOL_SIZE = 97;
+    private static readonly DEFAULT_POOL_SIZE = 97;
 
-    private poolSize: number;
-    private pool: Array<number>;
+    private readonly poolSize: number;
+    private readonly pool: number[];
     private pos: number;
 
     constructor(private rand: Random, poolSize?: number){

@@ -7,9 +7,9 @@ function b(value: number | bigint): bigint { return BigInt(value); }
  */
 export class LinearCongruentialRandom extends UniformRandom{
 
-    protected a: bigint;
-    protected c: bigint;
-    protected mask: bigint;
+    protected readonly a: bigint;
+    protected readonly c: bigint;
+    protected readonly mask: bigint;
     protected seed: bigint;
 
     constructor(a: number | bigint, c: number | bigint, p: number | bigint, seed?: number | bigint){
@@ -23,9 +23,15 @@ export class LinearCongruentialRandom extends UniformRandom{
 
     protected setSeed(seed: bigint){ this.seed = seed; }
 
-    protected nextBigInt(): bigint {
+    /** Return a random bigint value in [0, 2^p). */
+    nextBigInt(): bigint {
         this.seed = (this.seed * this.a + this.c) & this.mask;
         return this.seed;
+    }
+
+    /** Return a random integer in [0, 2^p). */
+    nextInteger(): number {
+        return Number(this.nextBigInt());
     }
     
     next(): number {
