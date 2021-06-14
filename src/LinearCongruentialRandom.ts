@@ -1,7 +1,5 @@
 import { UniformRandom } from "./Random";
 
-function b(value: number | bigint): bigint { return BigInt(value); }
-
 /**
  * Generate Linear congruential random numbers x_i = a*x_{i-1} + c mod 2^p.
  */
@@ -14,11 +12,11 @@ export class LinearCongruentialRandom extends UniformRandom{
 
     constructor(a: number | bigint, c: number | bigint, p: number | bigint, seed?: number | bigint){
         super();
-        this.a = b(a);
-        this.c = b(c);
-        this.mask = (b(1) << (b(p))) - b(1);
+        this.a = BigInt(a);
+        this.c = BigInt(c);
+        this.mask = (1n << (BigInt(p))) - 1n;
 
-        this.seed = seed ? BigInt(seed) : b(new Date().getTime());
+        this.seed = seed ? BigInt(seed) : BigInt(new Date().getTime());
     }
 
     protected setSeed(seed: bigint){ this.seed = seed; }
@@ -45,17 +43,17 @@ export class LinearCongruentialRandom extends UniformRandom{
 export class JavaRandom extends LinearCongruentialRandom{
 
     constructor(seed?: number | bigint){
-        super(b(25214903917), b(11), b(48), seed);
+        super(25214903917n, 11n, 48n, seed);
         this.setSeed((this.seed ^ this.a) & this.mask);
     }
 
-    private nextBigIntWithBits(bits: number): bigint {
+    private nextBits(bits: bigint): bigint {
         this.seed = this.nextBigInt();
-        return this.seed >> (b(48 - bits));
+        return this.seed >> (48n - bits);
     }
     
     next(): number {
-        const nextBI = (this.nextBigIntWithBits(26) << b(27)) + this.nextBigIntWithBits(27);
+        const nextBI = (this.nextBits(26n) << 27n) + this.nextBits(27n);
         return Number(nextBI) / Number.MAX_SAFE_INTEGER; 
     }
 }
