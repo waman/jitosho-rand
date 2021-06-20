@@ -4,7 +4,7 @@ import 'mocha';
 import { testRandomNumberRange } from './UniformRandomTester.spec';
 
 describe('UniformRandom', () => {
-    const n = 1000;
+    const n = 5000;
     
     describe('#next()', () => {
         it('should return a generator generating random numbers in [0,1)', () => {
@@ -46,7 +46,7 @@ describe('UniformRandom', () => {
 });
 
 describe('newRNG', () => {
-    const n = 1000;
+    const n = 5000;
     it('should return a generator generating random numbers in [0,1)', () => {
         // Exercise
         const rng = newRNG();

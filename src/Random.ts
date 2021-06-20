@@ -6,10 +6,9 @@ export interface Random{
 /**
  *  Create a new Random Number Generator (RNG).
  */
-export function* newRNG(rand?: Random){
-    const rng = rand ? rand : UniformRandom.getDefault();
+export function* newRNG(rand: Random = UniformRandom.getDefault()){
     while(true){
-        yield rng.next();
+        yield rand.next();
     }
 }
 
@@ -28,7 +27,7 @@ export abstract class UniformRandom implements Random{
     }
 
     /** Improve random number generator by pooling. */
-    improve(poolSize?: number): Random{
+    improve(poolSize: number = RandomImprove.DEFAULT_POOL_SIZE): Random{
         return new RandomImprove(this, poolSize);
     }
 
@@ -49,15 +48,15 @@ class DefaultUniformRandom extends UniformRandom{
  */
 class RandomImprove extends UniformRandom{
 
-    private static readonly DEFAULT_POOL_SIZE = 97;
+    public static readonly DEFAULT_POOL_SIZE = 97;
 
     private readonly poolSize: number;
     private readonly pool: number[];
     private pos: number;
 
-    constructor(private rand: Random, poolSize?: number){
+    constructor(private rand: Random, poolSize: number = RandomImprove.DEFAULT_POOL_SIZE){
         super();
-        this.poolSize = poolSize ? poolSize : RandomImprove.DEFAULT_POOL_SIZE;
+        this.poolSize = poolSize;
         this.pos = this.poolSize-1;
         this.pool = new Array(this.poolSize)
         for(let i = 0; i < this.poolSize; i++){
@@ -72,7 +71,7 @@ class RandomImprove extends UniformRandom{
         return result;
     }
 
-    improve(poolSize?: number): Random{
+    improve(poolSize: number): Random{
         return this;
     }
 }

@@ -13,7 +13,7 @@ export class MSequenceRandom extends UniformRandom {
     private x = new Uint32Array(MSequenceRandom.N);
     private p: number;
 
-    constructor(seed?: number){
+    constructor(seed: number = new Date().getTime()){
         super();
         this.p = 0;
 

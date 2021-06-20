@@ -4,7 +4,7 @@ import { UniformRandomTester } from './UniformRandomTester'
 import { testRandomNumberRange } from './UniformRandomTester.spec';
 
 describe('MersenneTwister', () => {
-    const n = 50;
+    const n = 10000;
 
     describe('#next() with no seed', () => {
         it('should return random numbers in [0,1)', () => {

@@ -12,13 +12,14 @@ export class LinearCongruentialRandom extends UniformRandom {
     protected readonly mask: bigint;
     protected seed: bigint;
 
-    constructor(a: number|bigint, c: number|bigint, p: number|bigint, seed?: number|bigint){
+    constructor(a: number|bigint, c: number|bigint, p: number|bigint,
+         seed: number|bigint = new Date().getTime()){
         super();
         this.a = BigInt(a);
         this.c = BigInt(c);
         this.mask = (1n << (BigInt(p))) - 1n;
 
-        this.seed = seed ? BigInt(seed) : BigInt(new Date().getTime());
+        this.seed = BigInt(seed);
     }
 
     protected setSeed(seed: bigint){ this.seed = seed; }
@@ -44,7 +45,7 @@ export class LinearCongruentialRandom extends UniformRandom {
  */
 export class JavaRandom extends LinearCongruentialRandom{
 
-    constructor(seed?: number | bigint){
+    constructor(seed: number | bigint = new Date().getTime()){
         super(25214903917n, 11n, 48n, seed);
         this.setSeed((this.seed ^ this.a) & this.mask);
     }

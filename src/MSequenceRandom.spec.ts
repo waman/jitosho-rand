@@ -4,7 +4,7 @@ import { UniformRandomTester } from './UniformRandomTester'
 import { testRandomNumberRange } from './UniformRandomTester.spec';
 
 describe('MSequenceRandom', () => {
-    const n = 1000;
+    const n = 5000;
 
     describe('#next() with no seed', () => {
         it('should return random numbers in [0,1)', () => {
@@ -25,14 +25,14 @@ describe('MSequenceRandom', () => {
     describe('#next() with number seed', () => {
         it('should return random numbers in [0,1)', () => {
             // SetUp
-            const rng = new MSequenceRandom(7);
+            const rng = new MSequenceRandom(17);
             // Verify
             testRandomNumberRange(rng, n);
         });
 
         it('should pass test of UniformRandomTester.', () => {
             // SetUp
-            const rng = new MSequenceRandom(7);
+            const rng = new MSequenceRandom(17);
             // Verify
             assert(UniformRandomTester.test(rng, n));
         });

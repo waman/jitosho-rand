@@ -16,11 +16,10 @@ export class MersenneTwister extends UniformRandom {
     private q: number;
     private r: number;
 
-    constructor(seed?: number|number[]){
+    constructor(seed: number|number[] = new Date().getTime()){
         super();
         let sd: number;
-        if(!seed) sd = new Date().getTime();
-        else if(typeof seed === 'number') sd = seed;
+        if(typeof seed === 'number') sd = seed;
         else sd = 19650218;
 
         this.x[0] = sd;
