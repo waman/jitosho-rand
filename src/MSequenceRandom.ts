@@ -1,6 +1,9 @@
 import { LinearCongruentialRandom } from "./LinearCongruentialRandom";
 import { UniformRandom } from "./Random";
 
+/**
+ * Ref: 『Javaによるアルゴリズム事典』M系列乱数 (M-sequence random numbers) MSequenceRandom.java
+ */
 export class MSequenceRandom extends UniformRandom {
 
     private static readonly N = 521;

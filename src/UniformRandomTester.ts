@@ -2,6 +2,9 @@ import { UniformRandom } from "./Random";
 
 type TestResult = {mean: boolean, cc: boolean};
 
+/**
+ * Ref: 『Javaによるアルゴリズム事典』乱数 (random numbers) RandomTest.java
+ */
 export class UniformRandomTester{
 
   static test(rand: UniformRandom, n: number): boolean {

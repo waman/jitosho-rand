@@ -2,15 +2,17 @@ import { UniformRandom } from "./Random";
 
 /**
  * Generate Linear congruential random numbers x_i = a*x_{i-1} + c mod 2^p.
+ *
+ * Ref: 『Javaによるアルゴリズム事典』線形合同法 (linear congruential method) JavaRandom.java
  */
-export class LinearCongruentialRandom extends UniformRandom{
+export class LinearCongruentialRandom extends UniformRandom {
 
     protected readonly a: bigint;
     protected readonly c: bigint;
     protected readonly mask: bigint;
     protected seed: bigint;
 
-    constructor(a: number | bigint, c: number | bigint, p: number | bigint, seed?: number | bigint){
+    constructor(a: number|bigint, c: number|bigint, p: number|bigint, seed?: number|bigint){
         super();
         this.a = BigInt(a);
         this.c = BigInt(c);
@@ -28,7 +30,7 @@ export class LinearCongruentialRandom extends UniformRandom{
     }
 
     /** Return a random integer in [0, 2^p). */
-    nextInteger(): number {
+    nextInt(): number {
         return Number(this.nextBigInt());
     }
     
@@ -53,7 +55,6 @@ export class JavaRandom extends LinearCongruentialRandom{
     }
     
     next(): number {
-        const nextBI = (this.nextBits(26n) << 27n) + this.nextBits(27n);
-        return Number(nextBI) / Number.MAX_SAFE_INTEGER; 
+        return Number((this.nextBits(26n) << 27n) + this.nextBits(27n)) / Number.MAX_SAFE_INTEGER; 
     }
 }

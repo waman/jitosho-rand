@@ -2,6 +2,20 @@ import { assert } from "chai";
 import { UniformRandom } from "./Random";
 import { UniformRandomTester } from "./UniformRandomTester";
 
+export function testRandomNumberRange(rng: UniformRandom, n: number) {
+    // SetUp
+    let appearNonzero = false, appearLessHarf = false, appearMoreHarf = false;
+    for(let i = 0; i < n; i++){
+        // Exercise
+        const r = rng.next();
+        // Verify
+        assert(0.0 <= r && r < 1.0);
+        if(r > 0.0) appearNonzero = true;
+        if(0.0 < r && r < 0.5) appearLessHarf = true;
+        if(0.5 < r && r < 1.0) appearMoreHarf = true;
+    }
+}
+
 describe('UniformRandomTester', () => {
 
     describe('#test()', () => {

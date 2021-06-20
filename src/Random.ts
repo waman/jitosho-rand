@@ -1,9 +1,11 @@
-interface Random{
+export interface Random{
     /** Return a random number. */
     next(): number;
 }
 
-/** Create a new Random Number Generator (RNG). */
+/**
+ *  Create a new Random Number Generator (RNG).
+ */
 export function* newRNG(rand?: Random){
     const rng = rand ? rand : UniformRandom.getDefault();
     while(true){
@@ -25,6 +27,7 @@ export abstract class UniformRandom implements Random{
         return min + this.next() * (max - min);
     }
 
+    /** Improve random number generator by pooling. */
     improve(poolSize?: number): Random{
         return new RandomImprove(this, poolSize);
     }
@@ -41,6 +44,9 @@ class DefaultUniformRandom extends UniformRandom{
     }
 }
 
+/**
+ * Ref: 『Javaによるアルゴリズム事典』乱数の改良法 (improving random numbers) RandomImprove.java
+ */
 class RandomImprove extends UniformRandom{
 
     private static readonly DEFAULT_POOL_SIZE = 97;

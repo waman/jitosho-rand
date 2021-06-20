@@ -1,6 +1,7 @@
 import { newRNG, UniformRandom } from './Random';
 import { assert } from 'chai';
 import 'mocha';
+import { testRandomNumberRange } from './UniformRandomTester.spec';
 
 describe('UniformRandom', () => {
     const n = 1000;
@@ -8,13 +9,9 @@ describe('UniformRandom', () => {
     describe('#next()', () => {
         it('should return a generator generating random numbers in [0,1)', () => {
             // SetUp
-            const rand = UniformRandom.getDefault();
-            // Exercise
-            for(let i = 0; i < n; i++){
-                const x = rand.next();
-                // Verify
-                assert(0.0 <= x && x < 1.0);
-            }
+            const rng = UniformRandom.getDefault();
+            // Verify
+            testRandomNumberRange(rng, n);
         });
     });
 
