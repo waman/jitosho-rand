@@ -13,6 +13,7 @@ export function* newRNG(rand: Random = UniformRandom.getDefault()){
 }
 
 export abstract class UniformRandom implements Random{
+
     /** Return a random number in [0,1). */
     abstract next(): number;
 
@@ -27,13 +28,33 @@ export abstract class UniformRandom implements Random{
     }
 
     /** Improve random number generator by pooling. */
-    improve(poolSize: number = RandomImprove.DEFAULT_POOL_SIZE): Random{
+    improve(poolSize: number = RandomImprove.DEFAULT_POOL_SIZE): UniformRandom{
         return new RandomImprove(this, poolSize);
     }
 
     /** UniformRandom implmentation with the Math.random(). */
     static getDefault(): UniformRandom{
         return new DefaultUniformRandom();
+    }
+
+    /**
+     * This method may be used for argument validation.
+     * @param name the argument name
+     * @param x the argument value
+     */
+    protected static validatePositive(name: string, x: number|bigint){
+        if(Number(x) <= 0) 
+            throw new Error(`${name} must be positive: ${x}`);
+    }
+
+    /**
+     * This method may be used for argument validation.
+     * @param name the argument name
+     * @param x the argument value
+     */
+    protected static validateNonNegative(name: string, x: number|bigint){
+        if(Number(x) < 0) 
+            throw new Error(`${name} must be non negative: ${x}`);
     }
 }
 
@@ -56,6 +77,7 @@ class RandomImprove extends UniformRandom{
 
     constructor(private rand: Random, poolSize: number = RandomImprove.DEFAULT_POOL_SIZE){
         super();
+        UniformRandom.validatePositive('poolSize', poolSize);
         this.poolSize = poolSize;
         this.pos = this.poolSize-1;
         this.pool = new Array(this.poolSize)
@@ -71,7 +93,7 @@ class RandomImprove extends UniformRandom{
         return result;
     }
 
-    improve(poolSize: number): Random{
+    improve(poolSize: number): UniformRandom{
         return this;
     }
 }

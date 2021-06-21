@@ -9,11 +9,14 @@ export function testRandomNumberRange(rng: UniformRandom, n: number) {
         // Exercise
         const r = rng.next();
         // Verify
-        assert(0.0 <= r && r < 1.0);
+        assert(0.0 <= r && r < 1.0, `a value out of range [0,1) appears: ${r}`);
         if(r > 0.0) appearNonzero = true;
-        if(0.0 < r && r < 0.5) appearLessHarf = true;
-        if(0.5 < r && r < 1.0) appearMoreHarf = true;
+        if(r < 0.5) appearLessHarf = true;
+        if(0.5 < r) appearMoreHarf = true;
     }
+    assert(appearNonzero, 'All values are zero.');
+    assert(appearLessHarf, 'All values are greater than 0.5');
+    assert(appearMoreHarf, 'All values are less than 0.5');
 }
 
 describe('UniformRandomTester', () => {

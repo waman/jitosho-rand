@@ -19,8 +19,13 @@ export class MersenneTwister extends UniformRandom {
     constructor(seed: number|number[] = new Date().getTime()){
         super();
         let sd: number;
-        if(typeof seed === 'number') sd = seed;
-        else sd = 19650218;
+        if(typeof seed === 'number'){
+            UniformRandom.validateNonNegative('seed', seed);
+            sd = seed;
+        }else{
+            seed.forEach(s => UniformRandom.validateNonNegative('seed', s));
+            sd = 19650218;
+        }
 
         this.x[0] = sd;
         for(let i = 1; i < MersenneTwister.N; i++){
@@ -29,23 +34,26 @@ export class MersenneTwister extends UniformRandom {
         this.p = 0; this.q = 1; this.r = MersenneTwister.M;
 
         // initialization for seed of number[]
-        if(typeof seed === 'object'){
-            const N = MersenneTwister.N;
-            let i = 1, j = 0;
-            const max = Math.max(N, seed.length);
-            for(let k = 0; k < max; k++){
-                this.x[i] ^= (this.x[i-1] ^ (this.x[i-1] >>> 30)) * 1664525;
-                this.x[i] += seed[j] + j;
-                if(++i >= N){ this.x[0] = this.x[N-1]; i = 1;}
-                if(++j >= seed.length) j = 0;
-            }
-            for(let k = 0; k < N-1; k++){
-                this.x[i] ^= (this.x[i-1] ^ (this.x[i-1] >>> 30)) * 1566083941;
-                this.x[i] -= i;
-                if(++i >= N){ this.x[0] = this.x[N-1]; i = 1; }
-            }
-            this.x[0] = MersenneTwister.UPPER_MASK;
+        if(typeof seed === 'object')
+            this.initForNumberArraySeed(seed);
+    }
+
+    private initForNumberArraySeed(seeds: number[]){
+        const N = MersenneTwister.N;
+        let i = 1, j = 0;
+        const max = Math.max(N, seeds.length);
+        for(let k = 0; k < max; k++){
+            this.x[i] ^= (this.x[i-1] ^ (this.x[i-1] >>> 30)) * 1664525;
+            this.x[i] += seeds[j] + j;
+            if(++i >= N){ this.x[0] = this.x[N-1]; i = 1;}
+            if(++j >= seeds.length) j = 0;
         }
+        for(let k = 0; k < N-1; k++){
+            this.x[i] ^= (this.x[i-1] ^ (this.x[i-1] >>> 30)) * 1566083941;
+            this.x[i] -= i;
+            if(++i >= N){ this.x[0] = this.x[N-1]; i = 1; }
+        }
+        this.x[0] = MersenneTwister.UPPER_MASK;
     }
 
     private nextBits(bits: number): number {

@@ -6,6 +6,14 @@ import { testRandomNumberRange } from './UniformRandomTester.spec';
 describe('MersenneTwister', () => {
     const n = 10000;
 
+    describe('constructor()', () => {
+        it('should throw an error when the constructer paramter is/includes negative value.', () => {
+            assert.throw(() => new MersenneTwister(-1));
+            assert.throw(() => new MersenneTwister([3, 5, -1, 7]));
+            assert.doesNotThrow(() => new MersenneTwister(0));
+        });
+    });
+
     describe('#next() with no seed', () => {
         it('should return random numbers in [0,1)', () => {
             // SetUp

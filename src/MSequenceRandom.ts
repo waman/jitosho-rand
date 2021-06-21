@@ -15,6 +15,7 @@ export class MSequenceRandom extends UniformRandom {
 
     constructor(seed: number = new Date().getTime()){
         super();
+        UniformRandom.validateNonNegative('seed', seed);
         this.p = 0;
 
         const initRng = new LinearCongruentialRandom(1566083941, 1, 32, seed);

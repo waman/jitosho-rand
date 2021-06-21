@@ -6,6 +6,28 @@ import { testRandomNumberRange } from './UniformRandomTester.spec';
 describe('LinearCongruentialRandom', () => {
     const n = 1000;
 
+    describe('constructor()', () => {
+        it('should throw an error when the constructer paramter a is not positive.', () => {
+            assert.throw(() => new LinearCongruentialRandom(-1, 11, 32, 1));
+            assert.throw(() => new LinearCongruentialRandom(0, 11, 32, 1));
+        });
+
+        it('should throw an error when the constructer paramter c is negative.', () => {
+            assert.throw(() => new LinearCongruentialRandom(2, -1, 32, 1));
+            assert.doesNotThrow(() => new LinearCongruentialRandom(2, 0, 32, 1));
+        });
+
+        it('should throw an error when the constructer paramter p is not positive.', () => {
+            assert.throw(() => new LinearCongruentialRandom(2, 11, 0, 1));
+            assert.throw(() => new LinearCongruentialRandom(2, 11, -1, 1));
+        });
+
+        it('should throw an error when the constructer paramter seed is negative.', () => {
+            assert.throw(() => new LinearCongruentialRandom(2, 11, 32, -1));
+            assert.doesNotThrow(() => new LinearCongruentialRandom(2, 11, 32, 0));
+        });
+    });
+
     describe('#next()', () => {
         it('should return random numbers in [0,1)', () => {
             // SetUp
@@ -25,6 +47,13 @@ describe('LinearCongruentialRandom', () => {
 
 describe('JavaRandomRandom', () => {
     const n = 5000;
+
+    describe('constructor()', () => {
+        it('should throw an error when the constructer paramter is negative.', () => {
+            assert.throw(() => new JavaRandom(-1));
+            assert.doesNotThrow(() => new JavaRandom(0));
+        });
+    });
 
     describe('#next() with no seed', () => {
         it('should return random numbers in [0,1)', () => {

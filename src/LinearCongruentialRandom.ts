@@ -13,16 +13,23 @@ export class LinearCongruentialRandom extends UniformRandom {
     protected seed: bigint;
 
     constructor(a: number|bigint, c: number|bigint, p: number|bigint,
-         seed: number|bigint = new Date().getTime()){
+                seed: number|bigint = new Date().getTime()){
         super();
+        UniformRandom.validatePositive('a', a);
+        UniformRandom.validateNonNegative('c', c);
+        UniformRandom.validatePositive('p', p);
+
         this.a = BigInt(a);
         this.c = BigInt(c);
         this.mask = (1n << (BigInt(p))) - 1n;
 
+        UniformRandom.validateNonNegative('seed', seed);
         this.seed = BigInt(seed);
     }
 
-    protected setSeed(seed: bigint){ this.seed = seed; }
+    protected setSeed(seed: bigint){ 
+        this.seed = seed;
+    }
 
     /** Return a random bigint value in [0, 2^p). */
     nextBigInt(): bigint {

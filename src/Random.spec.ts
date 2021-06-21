@@ -2,6 +2,7 @@ import { newRNG, UniformRandom } from './Random';
 import { assert } from 'chai';
 import 'mocha';
 import { testRandomNumberRange } from './UniformRandomTester.spec';
+import { UniformRandomTester } from './UniformRandomTester';
 
 describe('UniformRandom', () => {
     const n = 5000;
@@ -41,6 +42,45 @@ describe('UniformRandom', () => {
                 // Verify
                 assert(min <= x && x < max);
             }
+        });
+    });
+
+    describe('#improve()', () => {
+        it('should throw an error when the poolSize argument is not positive', () => {
+            assert.throw(() => UniformRandom.getDefault().improve(0));
+            assert.throw(() => UniformRandom.getDefault().improve(-1));
+        });
+
+        describe('UniformRandom returned by #improve() with no arg.', () => {
+            it('should return random numbers in [0,1)', () => {
+                // SetUp
+                const rng = UniformRandom.getDefault().improve();
+                // Verify
+                testRandomNumberRange(rng, n);
+            });
+
+            it('should pass test of UniformRandomTester.', () => {
+                // SetUp
+                const rng = UniformRandom.getDefault().improve();
+                // Verify
+                assert(UniformRandomTester.test(rng, n));
+            });
+        });
+
+        describe('UniformRandom returned by #improve() with pool sized', () => {
+            it('should return random numbers in [0,1)', () => {
+                // SetUp
+                const rng = UniformRandom.getDefault().improve(101);
+                // Verify
+                testRandomNumberRange(rng, n);
+            });
+
+            it('should pass test of UniformRandomTester.', () => {
+                // SetUp
+                const rng = UniformRandom.getDefault().improve(101);
+                // Verify
+                assert(UniformRandomTester.test(rng, n));
+            });
         });
     });
 });
