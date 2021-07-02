@@ -1,41 +1,37 @@
-export interface Random{
+export abstract class Random{
+
     /** Return a random number. */
-    next(): number;
-}
-
-/**
- *  Create a new Random Number Generator (RNG).
- */
-export function* newRNG(rand: Random = UniformRandom.getDefault()){
-    while(true){
-        yield rand.next();
-    }
-}
-
-export abstract class UniformRandom implements Random{
-
-    /** Return a random number in [0,1). */
     abstract next(): number;
 
-    /** Return a random number in [0,max). */
-    nextNumber(max: number): number {
-        return this.next() * max;
-    }
+    /** Return the min value of next(). */
+    abstract min(): number;
+    /** Return the max value of next(). */
+    abstract max(): number
+    /** Return the range of next(). */
+    range(): [number, number] { return [this.min(), this.max()]; }
 
-    /** Return a random number in [min, max). */
-    nextNumberIn(min: number, max: number): number {
-        return min + this.next() * (max - min);
+    /** Return the mean of next(). */
+    abstract mean(): number;
+    /** Return the median of next(). */
+    abstract median(): number;
+    /** Return the mode of next(). */
+    mode(m: 'min'|'max' = 'min'): number {
+        if(!m || m === 'min')
+            return this.modeMin();
+        else
+            return this.modeMax();
     }
+    protected abstract modeMin(): number;
+    protected abstract modeMax(): number;
 
-    /** Improve random number generator by pooling. */
-    improve(poolSize: number = RandomImprove.DEFAULT_POOL_SIZE): UniformRandom{
-        return new RandomImprove(this, poolSize);
-    }
+    /** PDF (probability density function). */
+    abstract pdf(x: number): number;
 
-    /** UniformRandom implmentation with the Math.random(). */
-    static getDefault(): UniformRandom{
-        return new DefaultUniformRandom();
-    }
+    /** CDF (cumulative density function). */
+    abstract cdf(x: number): number;
+
+    /** Return the variance value of next(). */
+    abstract variance(): number
 
     /**
      * This method may be used for argument validation.
@@ -58,42 +54,9 @@ export abstract class UniformRandom implements Random{
     }
 }
 
-class DefaultUniformRandom extends UniformRandom{
-    next(): number {
-        return Math.random();
-    }
-}
-
 /**
- * Ref: 『Javaによるアルゴリズム事典』乱数の改良法 (improving random numbers) RandomImprove.java
+ *  Create a new Random Number Generator (RNG).
  */
-class RandomImprove extends UniformRandom{
-
-    public static readonly DEFAULT_POOL_SIZE = 97;
-
-    private readonly poolSize: number;
-    private readonly pool: number[];
-    private pos: number;
-
-    constructor(private rand: Random, poolSize: number = RandomImprove.DEFAULT_POOL_SIZE){
-        super();
-        UniformRandom.validatePositive('poolSize', poolSize);
-        this.poolSize = poolSize;
-        this.pos = this.poolSize-1;
-        this.pool = new Array(this.poolSize)
-        for(let i = 0; i < this.poolSize; i++){
-            this.pool[i] = this.rand.next();
-        }
-    }
-
-    next(): number {
-        this.pos = Math.floor(this.poolSize * this.pool[this.pos]);
-        const result = this.pool[this.pos];
-        this.pool[this.pos] = this.rand.next();
-        return result;
-    }
-
-    improve(poolSize: number): UniformRandom{
-        return this;
-    }
+export function* newRNG(rand: Random){
+    while(true) yield rand.next();
 }

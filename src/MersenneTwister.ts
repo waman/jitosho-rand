@@ -1,9 +1,10 @@
-import { UniformRandom } from './Random'
+import { Random } from './Random';
+import { UnitUniformRandom } from './UniformRandom'
 
 /**
  * Ref: 『Javaによるアルゴリズム事典』メルセンヌ・ツイスター (Mersenne Twister) MersenneTwister.java
  */
-export class MersenneTwister extends UniformRandom {
+export class MersenneTwister extends UnitUniformRandom {
 
     private static readonly N = 624;
     private static readonly M = 397;
@@ -20,10 +21,10 @@ export class MersenneTwister extends UniformRandom {
         super();
         let sd: number;
         if(typeof seed === 'number'){
-            UniformRandom.validateNonNegative('seed', seed);
+            Random.validateNonNegative('seed', seed);
             sd = seed;
         }else{
-            seed.forEach(s => UniformRandom.validateNonNegative('seed', s));
+            seed.forEach(s => Random.validateNonNegative('seed', s));
             sd = 19650218;
         }
 
@@ -57,25 +58,23 @@ export class MersenneTwister extends UniformRandom {
     }
 
     private nextBits(bits: number): number {
-        // for code brevity
-        const N = MersenneTwister.N;
-        const UPPER_MASK = MersenneTwister.UPPER_MASK;
-        const LOWER_MASK = MersenneTwister.LOWER_MASK;
-        const MATRIX_A = MersenneTwister.MATRIX_A;
-
-        let y = (this.x[this.p] & UPPER_MASK) | (this.x[this.q] & LOWER_MASK);
-        y = this.x[this.r] ^ (y >>> 1) ^ ((y & 1) * MATRIX_A);
+        let y = upper(this.x[this.p]) | lower(this.x[this.q]);
+        y = this.x[this.r] ^ (y >>> 1) ^ ((y & 1) * MersenneTwister.MATRIX_A);
         this.x[this.p] = y;
 
-        if(++this.p === N) this.p = 0;
-        if(++this.q === N) this.q = 0;
-        if(++this.r === N) this.r = 0;
+        if(overMax(++this.p)) this.p = 0;
+        if(overMax(++this.q)) this.q = 0;
+        if(overMax(++this.r)) this.r = 0;
 
         y ^= (y >>> 11);
         y ^= (y << 7) & 0x9D2C5680;
         y ^= (y << 15) & 0xEFC60000;
         y ^= (y >>> 18);
         return y >>> (32 - bits);
+
+        function upper(x: number): number{ return x & MersenneTwister.UPPER_MASK; }
+        function lower(x: number): number{ return x & MersenneTwister.LOWER_MASK; }
+        function overMax(n: number): boolean { return n === MersenneTwister.N; }
     }
 
     private static readonly TO_UPPER = Number(1n << 27n);

@@ -1,10 +1,10 @@
 import { assert } from 'chai';
 import { WichmannHillRandom } from './WichmannHillRandom'
-import { UniformRandomTester } from './UniformRandomTester'
-import { testRandomNumberRange } from './UniformRandomTester.spec';
+import { testRandomStatistics } from './Random.spec'
+import { UnitUniformRandomTester} from './UnitUniformRandomTester'
 
 describe('WichmannHillRandom', () => {
-    const n = 2000;
+    const n = 10000;
 
     describe('constructor()', () => {
         it('should throw an error when one of constructer paramters is out of range [1,30000].', () => {
@@ -18,34 +18,34 @@ describe('WichmannHillRandom', () => {
     });
 
     describe('#next() with no seed', () => {
-        it('should return random numbers in [0,1)', () => {
+        it('should pass test of testRandomStatistics.', () => {
             // SetUp
-            const rng = new WichmannHillRandom();
+            const sut = new WichmannHillRandom();
             // Verify
-            testRandomNumberRange(rng, n);
+            testRandomStatistics(sut, n);
         });
 
-        it('should pass test of UniformRandomTester.', () => {
+        it('should pass test of UnitUniformRandomTester.', () => {
             // SetUp
-            const rng = new WichmannHillRandom();
+            const sut = new WichmannHillRandom();
             // Verify
-            assert(UniformRandomTester.test(rng, n));
+            assert(UnitUniformRandomTester.test(sut, n));
         });
     });
 
     describe('#next() with seed', () => {
-        it('should return random numbers in [0,1)', () => {
+        it('should pass test of testRandomStatistics.', () => {
             // SetUp
-            const rng = new WichmannHillRandom(2, 3, 5);
+            const sut = new WichmannHillRandom(2, 3, 5);
             // Verify
-            testRandomNumberRange(rng, n);
+            testRandomStatistics(sut, n);
         });
 
-        it('should pass test of UniformRandomTester.', () => {
+        it('should pass test of UnitUniformRandomTester.', () => {
             // SetUp
-            const rng = new WichmannHillRandom(2, 3, 5);
+            const sut = new WichmannHillRandom(2, 3, 5);
             // Verify
-            assert(UniformRandomTester.test(rng, n));
+            assert(UnitUniformRandomTester.test(sut, n));
         });
     });
 });

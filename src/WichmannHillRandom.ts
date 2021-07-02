@@ -1,10 +1,10 @@
-import { UniformRandom } from './Random'
+import { UnitUniformRandom } from './UniformRandom'
 
 /**
  * Ref: 『改訂新版 Cによる標準アルゴリズム事典』Wichmann-Hill の乱数発生法 
  * (Wichmann and Hill's random number generator) whrand.c
  */
-export class WichmannHillRandom extends UniformRandom {
+export class WichmannHillRandom extends UnitUniformRandom {
 
     private ix: number;
     private iy: number;
@@ -33,7 +33,7 @@ export class WichmannHillRandom extends UniformRandom {
         if(this.iy < 0) this.iy += 30307;
         if(this.iz < 0) this.iz += 30323;
 
-        let r = this.ix/30269.0 + this.iy/30307.0 + this.iz/30323.0;
+        let r = this.ix/30269 + this.iy/30307 + this.iz/30323;
         while(r >= 1) r--;
         return r;
     }

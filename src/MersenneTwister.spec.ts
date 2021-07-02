@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { MersenneTwister } from './MersenneTwister'
-import { UniformRandomTester } from './UniformRandomTester'
-import { testRandomNumberRange } from './UniformRandomTester.spec';
+import { UnitUniformRandomTester } from './UnitUniformRandomTester'
+import { testRandomStatistics } from './Random.spec';
 
 describe('MersenneTwister', () => {
     const n = 10000;
@@ -15,51 +15,51 @@ describe('MersenneTwister', () => {
     });
 
     describe('#next() with no seed', () => {
-        it('should return random numbers in [0,1)', () => {
+        it('should pass test of testRandomStatistics.', () => {
             // SetUp
-            const rng = new MersenneTwister();
+            const sut = new MersenneTwister();
             // Verify
-            testRandomNumberRange(rng, n);
+            testRandomStatistics(sut, n);
         });
 
-        it('should pass test of UniformRandomTester.', () => {
+        it('should pass test of UnitUniformRandomTester.', () => {
             // SetUp
-            const rng = new MersenneTwister();
+            const sut = new MersenneTwister();
             // Verify
-            assert(UniformRandomTester.test(rng, n));
+            assert(UnitUniformRandomTester.test(sut, n));
         });
     });
 
     describe('#next() with number seed', () => {
-        it('should return random numbers in [0,1)', () => {
+        it('should pass test of testRandomStatistics.', () => {
             // SetUp
-            const rng = new MersenneTwister(7);
+            const sut = new MersenneTwister(7);
             // Verify
-            testRandomNumberRange(rng, n);
+            testRandomStatistics(sut, n);
         });
 
-        it('should pass test of UniformRandomTester.', () => {
+        it('should pass test of UnitUniformRandomTester.', () => {
             // SetUp
-            const rng = new MersenneTwister(7);
+            const sut = new MersenneTwister(7);
             // Verify
-            assert(UniformRandomTester.test(rng, n));
+            assert(UnitUniformRandomTester.test(sut, n));
         });
     });
 
     describe('#next() with number[] seed', () => {
         const seeds = [7, 11, 31];
-        it('should return random numbers in [0,1)', () => {
+        it('should pass testRandomStatistics', () => {
             // SetUp
-            const rng = new MersenneTwister(seeds);
+            const sut = new MersenneTwister(seeds);
             // Verify
-            testRandomNumberRange(rng, n);
+            testRandomStatistics(sut, n);
         });
 
-        it('should pass test of UniformRandomTester.', () => {
+        it('should pass test of UnitUniformRandomTester.', () => {
             // SetUp
-            const rng = new MersenneTwister(seeds);
+            const sut = new MersenneTwister(seeds);
             // Verify
-            assert(UniformRandomTester.test(rng, n));
+            assert(UnitUniformRandomTester.test(sut, n));
         });
     });
 });

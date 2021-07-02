@@ -1,29 +1,38 @@
-import { UniformRandom } from "./Random";
+import { Random } from "./Random";
+import { UnitUniformRandom } from "./UniformRandom";
+
+export function newLinearCongruentialRandom(
+        a: number|bigint,
+        c: number|bigint,
+        p: number|bigint,
+        seed: number|bigint = new Date().getTime()): LinearCongruentialRandom{
+    if(c === 0)
+        return new SimpleLinearCongruentialRandom(a, p, seed);
+    else
+        return new LinearCongruentialRandomWithAddEnd(a, c, p, seed);
+}
 
 /**
  * Generate Linear congruential random numbers x_i = a*x_{i-1} + c mod 2^p.
+ * This class can be instantiated by the 'newLinearCongruentialRandom()' function.
  *
  * Ref: 『Javaによるアルゴリズム事典』線形合同法 (linear congruential method) JavaRandom.java
  */
-export class LinearCongruentialRandom extends UniformRandom {
+export abstract class LinearCongruentialRandom extends UnitUniformRandom {
 
     protected readonly a: bigint;
-    protected readonly c: bigint;
     protected readonly mask: bigint;
     protected seed: bigint;
 
-    constructor(a: number|bigint, c: number|bigint, p: number|bigint,
-                seed: number|bigint = new Date().getTime()){
+    protected constructor(a: number|bigint, p: number|bigint, seed: number|bigint = new Date().getTime()){
         super();
-        UniformRandom.validatePositive('a', a);
-        UniformRandom.validateNonNegative('c', c);
-        UniformRandom.validatePositive('p', p);
+        Random.validatePositive('a', a);
+        Random.validatePositive('p', p);
 
         this.a = BigInt(a);
-        this.c = BigInt(c);
         this.mask = (1n << (BigInt(p))) - 1n;
 
-        UniformRandom.validateNonNegative('seed', seed);
+        Random.validateNonNegative('seed', seed);
         this.seed = BigInt(seed);
     }
 
@@ -32,10 +41,7 @@ export class LinearCongruentialRandom extends UniformRandom {
     }
 
     /** Return a random bigint value in [0, 2^p). */
-    nextBigInt(): bigint {
-        this.seed = (this.seed * this.a + this.c) & this.mask;
-        return this.seed;
-    }
+    abstract nextBigInt(): bigint
 
     /** Return a random integer in [0, 2^p). */
     nextInt(): number {
@@ -47,12 +53,44 @@ export class LinearCongruentialRandom extends UniformRandom {
     }
 }
 
-/**
- * Java random emulator.
- */
-export class JavaRandom extends LinearCongruentialRandom{
+class SimpleLinearCongruentialRandom extends LinearCongruentialRandom {
 
-    constructor(seed: number | bigint = new Date().getTime()){
+    constructor(a: number|bigint, p: number|bigint,
+                seed: number|bigint = new Date().getTime()){
+        super(a, p, seed);
+    }
+
+    /** Return a random bigint value in [0, 2^p). */
+    nextBigInt(): bigint {
+        this.seed = (this.seed * this.a) & this.mask;
+        return this.seed;
+    }
+}
+
+class LinearCongruentialRandomWithAddEnd extends LinearCongruentialRandom {
+
+    protected readonly c: bigint;
+
+    constructor(a: number|bigint, c: number|bigint, p: number|bigint,
+                seed: number|bigint = new Date().getTime()){
+        super(a, p, seed);
+        Random.validateNonNegative('c', c);
+        this.c = BigInt(c);
+    }
+
+    /** Return a random bigint value in [0, 2^p). */
+    nextBigInt(): bigint {
+        this.seed = (this.seed * this.a + this.c) & this.mask;
+        return this.seed;
+    }
+}
+
+/**
+ * Old Java random emulator.
+ */
+export class OldJavaRandom extends LinearCongruentialRandomWithAddEnd{
+
+    constructor(seed: number|bigint = new Date().getTime()){
         super(25214903917n, 11n, 48n, seed);
         this.setSeed((this.seed ^ this.a) & this.mask);
     }

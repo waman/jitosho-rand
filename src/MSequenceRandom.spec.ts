@@ -1,10 +1,10 @@
 import { assert } from 'chai';
 import { MSequenceRandom } from './MSequenceRandom'
-import { UniformRandomTester } from './UniformRandomTester'
-import { testRandomNumberRange } from './UniformRandomTester.spec';
+import { UnitUniformRandomTester } from './UnitUniformRandomTester'
+import { testRandomStatistics } from './Random.spec';
 
 describe('MSequenceRandom', () => {
-    const n = 5000;
+    const n = 50000;
 
     describe('constructor()', () => {
         it('should throw an error when the constructer paramter is negative.', () => {
@@ -14,34 +14,34 @@ describe('MSequenceRandom', () => {
     });
 
     describe('#next() with no seed', () => {
-        it('should return random numbers in [0,1)', () => {
+        it('should pass test of testRandomStatistics.', () => {
             // SetUp
-            const rng = new MSequenceRandom();
+            const sut = new MSequenceRandom();
             // Verify
-            testRandomNumberRange(rng, n);
+            testRandomStatistics(sut, n);
         });
 
-        it('should pass test of UniformRandomTester.', () => {
+        it('should pass test of UnitUniformRandomTester.', () => {
             // SetUp
-            const rng = new MSequenceRandom();
+            const sut = new MSequenceRandom();
             // Verify
-            assert(UniformRandomTester.test(rng, n));
+            assert(UnitUniformRandomTester.test(sut, n));
         });
     });
 
     describe('#next() with number seed', () => {
-        it('should return random numbers in [0,1)', () => {
+        it('should pass test of testRandomStatistics.', () => {
             // SetUp
-            const rng = new MSequenceRandom(17);
+            const sut = new MSequenceRandom(17);
             // Verify
-            testRandomNumberRange(rng, n);
+            testRandomStatistics(sut, n);
         });
 
-        it('should pass test of UniformRandomTester.', () => {
+        it('should pass test of UnitUniformRandomTester.', () => {
             // SetUp
-            const rng = new MSequenceRandom(17);
+            const sut = new MSequenceRandom(17);
             // Verify
-            assert(UniformRandomTester.test(rng, n));
+            assert(UnitUniformRandomTester.test(sut, n));
         });
     });
 });

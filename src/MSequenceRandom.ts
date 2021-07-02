@@ -1,10 +1,11 @@
-import { LinearCongruentialRandom } from "./LinearCongruentialRandom";
-import { UniformRandom } from "./Random";
+import { newLinearCongruentialRandom } from "./LinearCongruentialRandom";
+import { Random } from "./Random";
+import { UnitUniformRandom } from "./UniformRandom";
 
 /**
  * Ref: 『Javaによるアルゴリズム事典』M系列乱数 (M-sequence random numbers) MSequenceRandom.java
  */
-export class MSequenceRandom extends UniformRandom {
+export class MSequenceRandom extends UnitUniformRandom {
 
     private static readonly N = 521;
     private static readonly M = 32;
@@ -15,10 +16,10 @@ export class MSequenceRandom extends UniformRandom {
 
     constructor(seed: number = new Date().getTime()){
         super();
-        UniformRandom.validateNonNegative('seed', seed);
+        Random.validateNonNegative('seed', seed);
         this.p = 0;
 
-        const initRng = new LinearCongruentialRandom(1566083941, 1, 32, seed);
+        const initRng = newLinearCongruentialRandom(1566083941, 1, 32, seed);
         const b0 = 0n, b1 = 1n, upperMask = b1 << 31n;
         for(let i = 0; i <= 16; i++){
             let u = b0;
