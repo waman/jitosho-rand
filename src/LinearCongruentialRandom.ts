@@ -1,5 +1,6 @@
 import { Random } from "./Random";
-import { UnitUniformRandom } from "./UniformRandom";
+import { UnitUniformRandom } from "./UniformDistribution";
+import { Validate } from "./Validate";
 
 export function newLinearCongruentialRandom(
         a: number|bigint,
@@ -26,13 +27,13 @@ export abstract class LinearCongruentialRandom extends UnitUniformRandom {
 
     protected constructor(a: number|bigint, p: number|bigint, seed: number|bigint = new Date().getTime()){
         super();
-        Random.validatePositive('a', a);
-        Random.validatePositive('p', p);
+        Validate.positive('a', a);
+        Validate.positive('p', p);
 
         this.a = BigInt(a);
         this.mask = (1n << (BigInt(p))) - 1n;
 
-        Random.validateNonNegative('seed', seed);
+        Validate.nonNegative('seed', seed);
         this.seed = BigInt(seed);
     }
 
@@ -74,7 +75,7 @@ class LinearCongruentialRandomWithAddEnd extends LinearCongruentialRandom {
     constructor(a: number|bigint, c: number|bigint, p: number|bigint,
                 seed: number|bigint = new Date().getTime()){
         super(a, p, seed);
-        Random.validateNonNegative('c', c);
+        Validate.nonNegative('c', c);
         this.c = BigInt(c);
     }
 

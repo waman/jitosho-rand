@@ -1,4 +1,4 @@
-import { UnitUniformRandom } from './UniformRandom'
+import { UnitUniformRandom } from './UniformDistribution'
 
 /**
  * Ref: 『改訂新版 Cによる標準アルゴリズム事典』Wichmann-Hill の乱数発生法 

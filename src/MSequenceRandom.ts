@@ -1,6 +1,7 @@
 import { newLinearCongruentialRandom } from "./LinearCongruentialRandom";
 import { Random } from "./Random";
-import { UnitUniformRandom } from "./UniformRandom";
+import { UnitUniformRandom } from "./UniformDistribution";
+import { Validate } from "./Validate";
 
 /**
  * Ref: 『Javaによるアルゴリズム事典』M系列乱数 (M-sequence random numbers) MSequenceRandom.java
@@ -16,7 +17,7 @@ export class MSequenceRandom extends UnitUniformRandom {
 
     constructor(seed: number = new Date().getTime()){
         super();
-        Random.validateNonNegative('seed', seed);
+        Validate.nonNegative('seed', seed);
         this.p = 0;
 
         const initRng = newLinearCongruentialRandom(1566083941, 1, 32, seed);

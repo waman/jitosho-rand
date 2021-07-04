@@ -1,5 +1,6 @@
 import { Random } from './Random';
-import { UnitUniformRandom } from './UniformRandom'
+import { UnitUniformRandom } from './UniformDistribution'
+import { Validate } from './Validate';
 
 /**
  * Ref: 『Javaによるアルゴリズム事典』メルセンヌ・ツイスター (Mersenne Twister) MersenneTwister.java
@@ -21,10 +22,10 @@ export class MersenneTwister extends UnitUniformRandom {
         super();
         let sd: number;
         if(typeof seed === 'number'){
-            Random.validateNonNegative('seed', seed);
+            Validate.nonNegative('seed', seed);
             sd = seed;
         }else{
-            seed.forEach(s => Random.validateNonNegative('seed', s));
+            seed.forEach(s => Validate.nonNegative('seed', s));
             sd = 19650218;
         }
 

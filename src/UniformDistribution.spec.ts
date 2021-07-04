@@ -1,7 +1,7 @@
 import { assert } from "chai";
 
 import { testRandomStatistics } from "./Random.spec";
-import { UniformRandom, UnitUniformRandom } from "./UniformRandom";
+import { UniformDistribution, UnitUniformDistribution, UnitUniformRandom } from "./UniformDistribution";
 import { UnitUniformRandomTester } from "./UnitUniformRandomTester";
 
 import { newLinearCongruentialRandom, OldJavaRandom } from "./LinearCongruentialRandom";
@@ -21,15 +21,15 @@ describe('UnitUniformRandomTester', () => {
     });
 });
 
-describe('UniformRandom', () => {
+describe('UniformDistribution', () => {
     const n = 50000;
 
     describe('Unit (the min and max values are not specified... UnitUniformRandom)', () => {
         it('created by create()', () => {
             // SetUp
-            const sut = UniformRandom.create();
+            const sut = UniformDistribution.create();
             // Verify
-            assert(sut instanceof UnitUniformRandom)
+            assert(sut instanceof UnitUniformDistribution)
             testRandomStatistics(sut, n);
         });
     });
@@ -37,14 +37,14 @@ describe('UniformRandom', () => {
 
     describe('Magnified (only the max value is specified)', () => {
         it('created by create(max)', () => 
-            testRandomStatistics(UniformRandom.create(7), n));
+            testRandomStatistics(UniformDistribution.create(7), n));
         it('created by create(undefined, max)', () => 
-            testRandomStatistics(UniformRandom.create(undefined, 13), n));
+            testRandomStatistics(UniformDistribution.create(undefined, 13), n));
     });
 
     describe('General (the min and max values are specified)', () => {
         it('created by create(min, max)', () => 
-            testRandomStatistics(UniformRandom.create(17, 43), n));
+            testRandomStatistics(UniformDistribution.create(17, 43), n));
     });
 });
 
@@ -53,7 +53,7 @@ describe('UnitUniformRandom', () => {
 
     function testUnitUniformRandom(sut: UnitUniformRandom, n: number){
         it('should pass test of testRandomStatistics.', () => {
-            testRandomStatistics(sut, n);
+            testRandomStatistics(new UnitUniformDistribution(), n, 0, 1, sut);
         });
 
         it('should pass test of UnitUniformRandomTester.', () => {
@@ -63,7 +63,7 @@ describe('UnitUniformRandom', () => {
     
     describe('#next()', () => {
         it('should pass test of testRandomStatistics.', () => 
-            testUnitUniformRandom(UnitUniformRandom.getDefault(), n));
+            testUnitUniformRandom(new UnitUniformDistribution().random(), n));
     });
 
     describe('#next(max)', () => {
@@ -105,7 +105,7 @@ describe('UnitUniformRandom', () => {
             assert.throw(() => UnitUniformRandom.getDefault().improve(-1));
         });
 
-        describe('UniformRandom returned by #improve() with no arg.', () => {
+        describe('UniformDistribution returned by #improve() with no arg.', () => {
             testUnitUniformRandom(UnitUniformRandom.getDefault().improve(), n);
         });
 

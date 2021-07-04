@@ -1,11 +1,11 @@
 import * as fs from 'fs';
-import { MSequenceRandom } from './MSequenceRandom';
+import { Distribution } from './Distribution';
 import { Random } from './Random'
-import { TriangularRandom } from './TriangularRandom'
+import { TriangularDistribution } from './TriangularDistribution';
 
 describe('Output histgram', () => {
     it('triangular distribution', () => {
-        const histo = new Histogram(new MSequenceRandom(), 1000000, 100);
+        const histo = new Histogram(TriangularDistribution.create(-1, 2, 1), 1000000, 100);
         outputHistogram('./dist/histogram.html', histo);
     });
 });
@@ -15,8 +15,8 @@ class Histogram{
     private labels: number[];
     private data: number[];
 
-    constructor(rng: Random, n: number, binCount: number,
-                min: number = rng.min(), max: number = rng.max()){
+    constructor(dist: Distribution, n: number, binCount: number,
+                min: number = dist.min(), max: number = dist.max()){
         const delta = (max - min) / binCount;
 
         this.labels = new Array(binCount);
@@ -27,8 +27,9 @@ class Histogram{
 
         const dt = new Array<number>(binCount);
         dt.fill(0);
+        const rand = dist.random();
         for(let i = 0; i < n; i++){
-            const r = rng.next();
+            const r = rand.next();
             const t = Math.floor((r - min)/delta);
             dt[t]++;
         }

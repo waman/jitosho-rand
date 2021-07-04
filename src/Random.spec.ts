@@ -1,7 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { newRNG, Random } from './Random';
-import { UniformRandom } from './UniformRandom';
+import { Distribution } from './Distribution';
+import { UniformDistribution, UnitUniformRandom } from './UniformDistribution';
 
 class Stat{
     private readonly binCount: number;
@@ -98,7 +99,11 @@ class Stat{
     }
 }
 
-export function testRandomStatistics(rand: Random, n: number, minExp = rand.min(), maxExp = rand.max()){
+export function testRandomStatistics(
+        dist: Distribution, n: number,
+        minExp = dist.min(), maxExp = dist.max(),
+        rand: Random = dist.random()){
+            
     if(minExp === Number.NEGATIVE_INFINITY)
         assert.fail('The min argument must not be negative infinity.');
     if(maxExp === Number.POSITIVE_INFINITY)
@@ -108,8 +113,8 @@ export function testRandomStatistics(rand: Random, n: number, minExp = rand.min(
     const stat = new Stat(binCount, minExp, maxExp);
 
     const delta = stat.delta;
-    const minIsInfinity = rand.min() === Number.NEGATIVE_INFINITY ? true : false;
-    const maxIsInfinity = rand.max() === Number.POSITIVE_INFINITY ? true : false;
+    const minIsInfinity = dist.min() === Number.NEGATIVE_INFINITY ? true : false;
+    const maxIsInfinity = dist.max() === Number.POSITIVE_INFINITY ? true : false;
 
     // Add data
     for(let i = 0; i < n; i++){
@@ -123,28 +128,28 @@ export function testRandomStatistics(rand: Random, n: number, minExp = rand.min(
     if(!minIsInfinity) assert(stat.min() >= minExp, 'min');
     if(!maxIsInfinity) assert(stat.max() <= maxExp, 'max');
     
-    if(rand.mean() === 0){
+    if(dist.mean() === 0){
         assert.approximately(stat.mean(), 0, 2*delta, 'mean');
     }else{
-        assert.approximately(stat.mean(), rand.mean(), stat.mean()*2/Math.sqrt(n), 'mean');
+        assert.approximately(stat.mean(), dist.mean(), stat.mean()*2/Math.sqrt(n), 'mean');
     }
 
-    assert.approximately(stat.variance(), rand.variance(), stat.variance()*2/Math.sqrt(n), 'variance');
+    assert.approximately(stat.variance(), dist.variance(), stat.variance()*2/Math.sqrt(n), 'variance');
 
-    assert.approximately(stat.median(), rand.median(), 2*delta, 'median');
+    assert.approximately(stat.median(), dist.median(), 2*delta, 'median');
 
-    if(!(rand instanceof UniformRandom)){
-        assert.approximately(stat.modeMin(), rand.mode('min'), 2*delta, 'modeMin');
-        assert.approximately(stat.modeMax(), rand.mode('max'), 2*delta, 'modeMax');
+    if(!(dist instanceof UniformDistribution)){
+        assert.approximately(stat.modeMin(), dist.mode('min'), 2*delta, 'modeMin');
+        assert.approximately(stat.modeMax(), dist.mode('max'), 2*delta, 'modeMax');
     }
 
     let acc = 0, sumFreq = 0;
     for(let i = 0; i < binCount; i++){
         const freq = stat.histogram(i);
         if(freq === 0){
-            assert(rand.pdf(stat.valueOf(i)) < Math.sqrt(binCount/n),
+            assert(dist.pdf(stat.valueOf(i)) < Math.sqrt(binCount/n),
                     `no value between [${stat.valueOf(i)},${stat.valueOf(i+1)}) appears: ` +
-                        `pdf value ${rand.pdf(stat.valueOf(i))}`);
+                        `pdf value ${dist.pdf(stat.valueOf(i))}`);
         }else{
             sumFreq += freq;
             acc += freq;
@@ -152,23 +157,23 @@ export function testRandomStatistics(rand: Random, n: number, minExp = rand.min(
             // assert PDF
             const x = stat.valueOf(i) + delta/2;
             const y = freq/(delta*n);
-            assert.approximately(rand.pdf(x), y, y*5/Math.sqrt(freq),
+            assert.approximately(dist.pdf(x), y, y*5/Math.sqrt(freq),
                 `PDF value is unexpected at ${x}`);
 
             // assert CDF
             const x1 = stat.valueOf(i+1);
             const z = acc/n;
-            assert.approximately(rand.cdf(x1), z, z*3/Math.sqrt(sumFreq),
+            assert.approximately(dist.cdf(x1), z, z*3/Math.sqrt(sumFreq),
                 `CDF value is unexpected at ${x1}`);
         }
     }
     if(!minIsInfinity){
-        assert(rand.pdf(rand.min()-1) === 0, `PDF value is unexpected at min-1`);
-        assert(rand.cdf(rand.min()-1) === 0, `CDF value is unexpected at min-1`);
+        assert(dist.pdf(dist.min()-1) === 0, `PDF value is unexpected at min-1`);
+        assert(dist.cdf(dist.min()-1) === 0, `CDF value is unexpected at min-1`);
     }
     if(!maxIsInfinity){
-        assert(rand.pdf(rand.max()+1) === 0, `PDF value is unexpected at max+1`);
-        assert(rand.cdf(rand.max()+1) === 1, `CDF value is unexpected at max+1`);
+        assert(dist.pdf(dist.max()+1) === 0, `PDF value is unexpected at max+1`);
+        assert(dist.cdf(dist.max()+1) === 1, `CDF value is unexpected at max+1`);
     }
 }
 
@@ -176,7 +181,7 @@ describe('newRNG', () => {
     const n = 5000;
     it('should return a generator generating random numbers in [0,1)', () => {
         // Exercise
-        const rng = newRNG(UniformRandom.getDefault());
+        const rng = newRNG(UnitUniformRandom.getDefault());
         for(let i = 0; i < n; i++){
             const x = rng.next().value;
             // Verify

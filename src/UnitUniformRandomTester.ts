@@ -1,4 +1,4 @@
-import { UniformRandom, UnitUniformRandom } from "./UniformRandom";
+import { UnitUniformRandom } from "./UniformDistribution";
 
 type TestResult = {mean: boolean, cc: boolean};
 
@@ -16,7 +16,7 @@ export class UnitUniformRandomTester{
             && testResults.filter(r => r.cc).length >= 18;  // prefer to 19
   }
 
-  private static testOneTime(rand: UniformRandom, n: number): TestResult {
+  private static testOneTime(rand: UnitUniformRandom, n: number): TestResult {
     let x = 0, x0 = 0, s1 = 0, s2 = 0, r = 0;
     for(let xprev = 0, i = 0; i < n; i++){
       x = rand.next() - 0.5;

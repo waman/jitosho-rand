@@ -1,20 +1,19 @@
 import * as fs from 'fs';
-import { Random } from './Random'
-import { TriangularRandom } from './TriangularRandom'
-import { MSequenceRandom } from './MSequenceRandom';
+import { Distribution } from './Distribution';
+import { ExponentialDistribution } from './ExponentialDistribution';
 
 describe('Output pdf', () => {
     it('triangular distribution', () => {
-        outputPdf('./dist/pdf.html', new MSequenceRandom());
+        outputPdf('./dist/pdf.html', ExponentialDistribution.create());
     });
 });
 
-function outputPdf(file: string, rand: Random){
+function outputPdf(file: string, dist: Distribution){
     const n = 100;
-    const delta = (rand.max() - rand.min())/n;
+    const delta = (dist.max() - dist.min())/n;
     const data = new Array<{x: number, y: number}>();
-    for(let x = rand.min(); x < rand.max(); x+=delta){
-        data.push({x: x, y: rand.pdf(x)});
+    for(let x = dist.min(); x < dist.max(); x+=delta){
+        data.push({x: x, y: dist.pdf(x)});
     }
 
     const content =

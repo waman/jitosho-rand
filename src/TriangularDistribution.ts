@@ -1,45 +1,37 @@
+import { Distribution } from './Distribution';
 import { Random } from './Random'
-import { UnitUniformRandom } from './UniformRandom';
+import { UnitUniformRandom } from './UniformDistribution';
 
 /**
  * This class can instantiate by static 'create' method.
  * 
  * Ref: 『Javaによるアルゴリズム事典』三角分布 (triangular distribution) TriangularRandom.java
  */
-export abstract class TriangularRandom extends Random {
+export abstract class TriangularDistribution extends Distribution {
 
     protected constructor(){
         super();
     }
 
-    static create(min: number = -1, 
-                  max: number = 1,
-                  mode?: number,
-                  random: UnitUniformRandom = UnitUniformRandom.getDefault()): TriangularRandom{
+    static create(min: number = -1, max: number = 1,mode?: number): TriangularDistribution{
         if(min === -1 && max === 1 && mode === undefined) 
-            return new SimpleTriangularRandom(random);
+            return new SimpleTriangularDistribution();
         else if(mode === undefined || min + max === 2*mode)
-            return new SymmetricTriangularRandom(min, max, random);
+            return new SymmetricTriangularDistribution(min, max);
         else 
-            return new GeneralTriangularRandom(min, max, mode, random);
+            return new GeneralTriangularDistribution(min, max, mode);
     }
 }
 
-class SimpleTriangularRandom extends TriangularRandom {
-
-    constructor(private readonly random: UnitUniformRandom){ 
-        super();
-    }
-    
-    next(): number { return this.random.next() - this.random.next();  }
+class SimpleTriangularDistribution extends TriangularDistribution {
     
     min(): number { return -1; }
     max(): number { return 1; }
     mean(): number { return 0; }
+    variance(): number { return 1/6; }
     median(): number { return 0; }
     protected modeMin(): number { return 0; }
     protected modeMax(): number { return 0; }
-    variance(): number { return 1/6; }
 
     pdf(x: number): number {
         if(x < -1) return 0;
@@ -61,34 +53,35 @@ class SimpleTriangularRandom extends TriangularRandom {
             return 1;
         }
     }
+
+    random(rand?: UnitUniformRandom): Random {
+        const random = rand ? rand : UnitUniformRandom.getDefault();
+        return new class extends Random{
+            next(): number { return random.next() - random.next(); }
+        }();
+    }
 }
 
-class SymmetricTriangularRandom extends TriangularRandom {
+class SymmetricTriangularDistribution extends TriangularDistribution {
 
     private readonly interval: number;
 
     constructor(private readonly _min: number,
-                private readonly _max: number,
-                private readonly random: UnitUniformRandom){
+                private readonly _max: number){
         super();
         if(this._min >= this._max)
             throw new Error(`min must be greater than max; min: ${this._min}, max: ${this._max}.`)
 
-        this.random = random;
         this.interval = _max - _min;
-    }
-    
-    next(): number {
-        return (this.random.next() - this.random.next() + 1) * this.interval / 2 + this._min; 
     }
     
     min(): number { return this._min; }
     max(): number { return this._max; }
     mean(): number { return (this._min + this._max)/2; }
+    variance(): number { return this.interval*this.interval/24; }
     median(): number { return this.mean(); }
     protected modeMin(): number { return this.mean(); }
     protected modeMax(): number { return this.mean(); }
-    variance(): number { return this.interval*this.interval/24; }
 
     pdf(x: number): number {
         if(x < this._min) 
@@ -114,6 +107,16 @@ class SymmetricTriangularRandom extends TriangularRandom {
             return 1;
         }
     }
+
+    random(rand?: UnitUniformRandom): Random {
+        const random = rand ? rand : UnitUniformRandom.getDefault();
+        const interval = this.interval, min = this._min;
+        return new class extends Random{
+            next(): number {
+                return (random.next() - random.next() + 1) * interval / 2 + min; 
+            }
+        }();
+    }
 }
 
 /**
@@ -121,33 +124,25 @@ class SymmetricTriangularRandom extends TriangularRandom {
  * 
  * Ref: <a href="https://en.m.wikipedia.org/wiki/Triangular_distribution">Wikipedia: Triangular distribution</a>
  */
-class GeneralTriangularRandom extends TriangularRandom {
+class GeneralTriangularDistribution extends TriangularDistribution {
 
     constructor(private readonly a: number,
                 private readonly b: number,
-                private readonly c: number,
-                private readonly random: UnitUniformRandom){
+                private readonly c: number){
         super();
         if(!(this.a < this.c && this.c < this.b))
             throw new Error('a, b, and c don\'t have the correct order relation (a < c < b); ' +
                 ` a: ${this.a}, b: ${this.b}, c: ${this.c}.`)
     }
     
-    next(): number {
-        const ba = this.b - this.a,
-              ca = this.c - this.a,
-              fc = ca/ba;
-
-        const r = this.random.next();
-        if(r < fc)
-            return this.a + Math.sqrt(r*(ba)*(ca));
-        else
-            return this.b - Math.sqrt((1-r)*(ba)*(ba-ca))
-    }
-    
     min(): number { return this.a; }
     max(): number { return this.b; }
     mean(): number { return (this.a + this.b + this.c)/3; }
+    variance(): number {
+        return (this.a*this.a + this.b*this.b + this.c*this.c 
+                - this.a*this.b - this.b*this.c - this.c*this.a)/18;
+    }
+    
     median(): number { 
         if(this.c >= (this.a + this.b)/2){
             return this.a + Math.sqrt((this.b - this.a)*(this.c - this.a)/2);
@@ -157,10 +152,6 @@ class GeneralTriangularRandom extends TriangularRandom {
     }
     protected modeMin(): number { return this.c; }
     protected modeMax(): number { return this.c; }
-    variance(): number {
-        return (this.a*this.a + this.b*this.b + this.c*this.c 
-                - this.a*this.b - this.b*this.c - this.c*this.a)/18;
-    }
 
     pdf(x: number): number {
         if(x < this.a) 
@@ -184,6 +175,22 @@ class GeneralTriangularRandom extends TriangularRandom {
             return 1 - y*y/((this.b - this.a)*(this.b - this.c));
         }else{
             return 1;
+        }
+    }
+
+    random(rand?: UnitUniformRandom): Random{
+        const random = rand ? rand : UnitUniformRandom.getDefault();
+        const a = this.a, b = this.b;
+        const ba = b-a, ca = this.c-a, fc = ca/ba;
+
+        return new class extends Random{
+            next(): number {
+                const r = random.next();
+                if(r < fc)
+                    return a + Math.sqrt(r*ba*ca);
+                else
+                    return b - Math.sqrt((1-r)*ba*(ba-ca))
+            }
         }
     }
 }
