@@ -49,7 +49,7 @@ describe('UniformRandom', () => {
 });
 
 describe('UnitUniformRandom', () => {
-    const n = 100000;
+    const n = 50000;
 
     function testUnitUniformRandom(sut: UnitUniformRandom, n: number){
         it('should pass test of testRandomStatistics.', () => {
@@ -146,7 +146,7 @@ describe('UnitUniformRandom', () => {
                 testUnitUniformRandom(newLinearCongruentialRandom(1566083941, 0, 32, 12345), n));
         });
         
-        describe('OldJavaRandomRandom', () => {
+        describe('OldJavaRandom', () => {
         
             describe('constructor()', () => {
                 it('should throw an error when the constructer paramter is negative.', () => {
