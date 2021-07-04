@@ -16,9 +16,9 @@ export abstract class TriangularRandom extends Random {
                   max: number = 1,
                   mode?: number,
                   random: UnitUniformRandom = UnitUniformRandom.getDefault()): TriangularRandom{
-        if(min === -1 && max === 1 && !mode) 
+        if(min === -1 && max === 1 && mode === undefined) 
             return new SimpleTriangularRandom(random);
-        else if(!mode || min + max === 2*mode)
+        else if(mode === undefined || min + max === 2*mode)
             return new SymmetricTriangularRandom(min, max, random);
         else 
             return new GeneralTriangularRandom(min, max, mode, random);
@@ -71,6 +71,9 @@ class SymmetricTriangularRandom extends TriangularRandom {
                 private readonly _max: number,
                 private readonly random: UnitUniformRandom){
         super();
+        if(this._min >= this._max)
+            throw new Error(`min must be greater than max; min: ${this._min}, max: ${this._max}.`)
+
         this.random = random;
         this.interval = _max - _min;
     }
@@ -125,6 +128,9 @@ class GeneralTriangularRandom extends TriangularRandom {
                 private readonly c: number,
                 private readonly random: UnitUniformRandom){
         super();
+        if(!(this.a < this.c && this.c < this.b))
+            throw new Error('a, b, and c don\'t have the correct order relation (a < c < b); ' +
+                ` a: ${this.a}, b: ${this.b}, c: ${this.c}.`)
     }
     
     next(): number {

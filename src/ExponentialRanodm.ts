@@ -51,6 +51,7 @@ class GeneralExponentialRandom extends ExponentialRandom {
     constructor(private readonly lambda: number,
                 private readonly random: UnitUniformRandom){
         super();
+        Random.validatePositive('lambda', this.lambda);
     }
     
     next(): number { return -Math.log(1-this.random.next()) / this.lambda; }
