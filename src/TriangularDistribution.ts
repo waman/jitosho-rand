@@ -15,7 +15,7 @@ export abstract class TriangularDistribution extends Distribution {
 
     static create(min: number = -1, max: number = 1,mode?: number): TriangularDistribution{
         if(min === -1 && max === 1 && mode === undefined) 
-            return new SimpleTriangularDistribution();
+            return SimpleTriangularDistribution.INSTANCE;
         else if(mode === undefined || min + max === 2*mode)
             return new SymmetricTriangularDistribution(min, max);
         else 
@@ -24,6 +24,10 @@ export abstract class TriangularDistribution extends Distribution {
 }
 
 class SimpleTriangularDistribution extends TriangularDistribution {
+
+    static readonly INSTANCE = new SimpleTriangularDistribution();
+
+    private constructor(){super();}
     
     min(): number { return -1; }
     max(): number { return 1; }
@@ -54,10 +58,9 @@ class SimpleTriangularDistribution extends TriangularDistribution {
         }
     }
 
-    random(rand?: UnitUniformRandom): Random {
-        const random = rand ? rand : UnitUniformRandom.getDefault();
+    random(rand: UnitUniformRandom = UnitUniformRandom.getDefault()): Random {
         return new class extends Random{
-            next(): number { return random.next() - random.next(); }
+            next(): number { return rand.next() - rand.next(); }
         }();
     }
 }
@@ -108,12 +111,11 @@ class SymmetricTriangularDistribution extends TriangularDistribution {
         }
     }
 
-    random(rand?: UnitUniformRandom): Random {
-        const random = rand ? rand : UnitUniformRandom.getDefault();
+    random(rand: UnitUniformRandom = UnitUniformRandom.getDefault()): Random {
         const interval = this.interval, min = this._min;
         return new class extends Random{
             next(): number {
-                return (random.next() - random.next() + 1) * interval / 2 + min; 
+                return (rand.next() - rand.next() + 1) * interval / 2 + min; 
             }
         }();
     }
@@ -178,14 +180,13 @@ class GeneralTriangularDistribution extends TriangularDistribution {
         }
     }
 
-    random(rand?: UnitUniformRandom): Random{
-        const random = rand ? rand : UnitUniformRandom.getDefault();
+    random(rand: UnitUniformRandom = UnitUniformRandom.getDefault()): Random{
         const a = this.a, b = this.b;
         const ba = b-a, ca = this.c-a, fc = ca/ba;
 
         return new class extends Random{
             next(): number {
-                const r = random.next();
+                const r = rand.next();
                 if(r < fc)
                     return a + Math.sqrt(r*ba*ca);
                 else

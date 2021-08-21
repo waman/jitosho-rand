@@ -1,39 +1,35 @@
 import * as fs from 'fs';
 import { Distribution } from './Distribution';
-import { Random } from './Random'
-import { TriangularDistribution } from './TriangularDistribution';
+import { Stat } from './Distribution.spec';
+import { NormalDistribution } from './NormalDistribution';
 
 describe('Output histgram', () => {
     it('triangular distribution', () => {
-        const histo = new Histogram(TriangularDistribution.create(-1, 2, 1), 1000000, 100);
+        const histo = new Histogram(NormalDistribution.create(3, 0.5), 10000000, 1e-2);
         outputHistogram('./dist/histogram.html', histo);
     });
 });
 
 class Histogram{
 
-    private labels: number[];
-    private data: number[];
+    private labels: number[] = new Array<number>();
+    private data: number[] = new Array<number>();
 
-    constructor(dist: Distribution, n: number, binCount: number,
-                min: number = dist.min(), max: number = dist.max()){
-        const delta = (max - min) / binCount;
-
-        this.labels = new Array(binCount);
-        for(let i = 0, x = min; i < binCount; i++){
-            this.labels[i] = Math.round((x+delta/2)*binCount)/binCount;
-            x += delta;
-        }
-
-        const dt = new Array<number>(binCount);
-        dt.fill(0);
+    constructor(dist: Distribution, n: number, delta: number){
+        const deltaInv = Math.round(1/delta);
+        const stat = new Stat(delta);
         const rand = dist.random();
         for(let i = 0; i < n; i++){
-            const r = rand.next();
-            const t = Math.floor((r - min)/delta);
-            dt[t]++;
+            stat.addData(rand.next());
         }
-        this.data = dt.map(y => y/(delta*n));
+
+        const nMin = stat.minIndex();
+        const nMax = stat.maxIndex();
+        for(let i = nMin; i < nMax; i++){
+            const x = stat.x(i);
+            this.labels[i-nMin] = Math.round((x+delta/2)*deltaInv)/deltaInv;
+            this.data[i-nMin] = stat.frequency(i)/(delta*n);
+        }
     }
 
     getLabels(): number[]{

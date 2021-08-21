@@ -49,8 +49,8 @@ export class UnitUniformDistribution extends UniformDistribution{
         else return 1;
     }
 
-    random(rand?: UnitUniformRandom): UnitUniformRandom {
-        return rand ? rand : UnitUniformRandom.getDefault();
+    random(rand: UnitUniformRandom = UnitUniformRandom.getDefault()): UnitUniformRandom {
+        return rand;
     }
 }
 
@@ -75,11 +75,10 @@ class MagnifiedUniformDistribution extends UniformDistribution{
         else return 1;
     }
 
-    random(rand?: UnitUniformRandom): Random {
-        const random = rand ? rand : UnitUniformRandom.getDefault();
+    random(rand: UnitUniformRandom = UnitUniformRandom.getDefault()): Random {
         const max = this._max;
         return new class extends Random{
-            next(): number { return random.next() * max; }
+            next(): number { return rand.next() * max; }
         }();
     }
 }
@@ -109,11 +108,10 @@ class GeneralUniformDistribution extends UniformDistribution{
         else return 1
     }
 
-    random(rand?: UnitUniformRandom): Random {
-        const random = rand ? rand : UnitUniformRandom.getDefault();
+    random(rand: UnitUniformRandom = UnitUniformRandom.getDefault()): Random {
         const min = this._min, interval = this.interval;
         return new class extends Random{
-            next(): number { return random.next() * interval + min; }
+            next(): number { return rand.next() * interval + min; }
         }();
     }
 }

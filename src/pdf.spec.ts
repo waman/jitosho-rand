@@ -1,18 +1,20 @@
 import * as fs from 'fs';
 import { Distribution } from './Distribution';
-import { ExponentialDistribution } from './ExponentialDistribution';
+import { NormalDistribution } from './NormalDistribution';
 
 describe('Output pdf', () => {
     it('triangular distribution', () => {
-        outputPdf('./dist/pdf.html', ExponentialDistribution.create());
+        outputPdf('./dist/pdf.html', NormalDistribution.create(), -1, 6);
     });
 });
 
-function outputPdf(file: string, dist: Distribution){
+function outputPdf(file: string, dist: Distribution,
+                    min: number = dist.min() !== Number.NEGATIVE_INFINITY ? dist.min() : -1,
+                    max: number = dist.max() !== Number.POSITIVE_INFINITY ? dist.max() : 1){
     const n = 100;
-    const delta = (dist.max() - dist.min())/n;
+    const delta = (max - min)/n;
     const data = new Array<{x: number, y: number}>();
-    for(let x = dist.min(); x < dist.max(); x+=delta){
+    for(let x = min; x < max; x+=delta){
         data.push({x: x, y: dist.pdf(x)});
     }
 

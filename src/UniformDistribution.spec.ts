@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { testRandomStatistics } from "./Random.spec";
+import { testDistribution } from "./Distribution.spec";
 import { UniformDistribution, UnitUniformDistribution, UnitUniformRandom } from "./UniformDistribution";
 import { UnitUniformRandomTester } from "./UnitUniformRandomTester";
 
@@ -23,6 +23,7 @@ describe('UnitUniformRandomTester', () => {
 
 describe('UniformDistribution', () => {
     const n = 50000;
+    const delta = 0.01;
 
     describe('Unit (the min and max values are not specified... UnitUniformRandom)', () => {
         it('created by create()', () => {
@@ -30,30 +31,31 @@ describe('UniformDistribution', () => {
             const sut = UniformDistribution.create();
             // Verify
             assert(sut instanceof UnitUniformDistribution)
-            testRandomStatistics(sut, n);
+            testDistribution(sut, n, delta);
         });
     });
 
 
     describe('Magnified (only the max value is specified)', () => {
         it('created by create(max)', () => 
-            testRandomStatistics(UniformDistribution.create(7), n));
+            testDistribution(UniformDistribution.create(7), n, delta));
         it('created by create(undefined, max)', () => 
-            testRandomStatistics(UniformDistribution.create(undefined, 13), n));
+            testDistribution(UniformDistribution.create(undefined, 13), n, delta));
     });
 
     describe('General (the min and max values are specified)', () => {
         it('created by create(min, max)', () => 
-            testRandomStatistics(UniformDistribution.create(17, 43), n));
+            testDistribution(UniformDistribution.create(17, 43), n, delta));
     });
 });
 
 describe('UnitUniformRandom', () => {
     const n = 50000;
+    const delta = 0.01;
 
     function testUnitUniformRandom(sut: UnitUniformRandom, n: number){
         it('should pass test of testRandomStatistics.', () => {
-            testRandomStatistics(new UnitUniformDistribution(), n, 0, 1, sut);
+            testDistribution(new UnitUniformDistribution(), n, delta, sut);
         });
 
         it('should pass test of UnitUniformRandomTester.', () => {
